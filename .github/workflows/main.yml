@@ -1,0 +1,36 @@
+name: Zip and Upload to S3
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          # Install any dependencies required for your script (if any)
+          # For example:
+          # npm install
+
+      - name: Zip files
+        run: |
+          # Run a script to create the zip file
+          # Example: zip -r myfiles.zip .
+
+      - name: Upload to S3
+        uses: jakejarvis/s3-sync-action@v0.5.0
+        with:
+          args: --acl public-read --delete
+        env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          SOURCE_DIR: ./  # Directory containing the zip file
+          DEST_DIR: /  # Destination directory in S3 (root directory)
