@@ -6,26 +6,50 @@ on:
       - main
 
 jobs:
+  get-latest-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get latest release version
+        id: get_latest_release
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const latestRelease = await github.repos.getLatestRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+            console.log(latestRelease.data.tag_name);
+            const currentVersion = latestRelease.data.tag_name;
+            const versionComponents = currentVersion.split('.');
+            const majorVersion = parseInt(versionComponents[0]);
+            const minorVersion = parseInt(versionComponents[1]);
+            const patchVersion = parseInt(versionComponents[2]);
+            const nextVersion = `${majorVersion}.${minorVersion}.${patchVersion + 1}`;
+            console.log(nextVersion);
+            core.setOutput('next_version', nextVersion);
+
   create-release:
     runs-on: ubuntu-latest
+    needs: get-latest-release
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Add steps for creating a release...
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v1.0.0  # Replace with your version number
-          release_name: Release v1.0.0  # Replace with your release name
+          tag_name: ${{ steps.get-latest-release.outputs.next_version }}
+          release_name: Release ${{ steps.get-latest-release.outputs.next_version }}
           prerelease: false
           draft: false
           body: |
-            This is the release notes for version 1.0.0.
+            This is the release notes for version ${{ steps.get-latest-release.outputs.next_version }}.
             You can add more details here.
 
   build-and-upload:
@@ -33,27 +57,4 @@ jobs:
     needs: create-release
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Install dependencies
-        run: |
-          # Install any dependencies required for your script (if any)
-          # For example:
-          # npm install
-
-      - name: Zip files
-        run: |
-          # Run a script to create the zip file
-          # Example: zip -r myfiles.zip .
-
-      - name: Upload to S3
-        uses: jakejarvis/s3-sync-action@v0.5.0
-        with:
-          args: --acl public-read --delete
-        env:
-          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          SOURCE_DIR: ./  # Directory containing the zip file
-          DEST_DIR: /  # Destination directory in S3 (root directory)
+      # Add your steps for building and uploading to S3 here
