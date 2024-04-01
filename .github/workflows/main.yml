@@ -36,8 +36,8 @@ jobs:
           DEST_DIR: /  # Destination directory in S3 (root directory)
 
   create-release:
-    needs: build
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
