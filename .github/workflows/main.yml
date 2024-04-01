@@ -44,12 +44,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.get-latest-release.outputs.next_version }}
-          release_name: Release ${{ steps.get-latest-release.outputs.next_version }}
+          tag_name: ${{ needs.get-latest-release.outputs.next_version }}  # Use the tag name from the get-latest-release job
+          release_name: Release ${{ needs.get-latest-release.outputs.next_version }}
           prerelease: false
           draft: false
           body: |
-            This is the release notes for version ${{ steps.get-latest-release.outputs.next_version }}.
+            This is the release notes for version ${{ needs.get-latest-release.outputs.next_version }}.
             You can add more details here.
 
   build-and-upload:
