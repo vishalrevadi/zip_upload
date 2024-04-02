@@ -1,14 +1,14 @@
 name: Zip and Upload to S3
 
 on:
-  push:
+ push:
     branches:
       - main
 
 permissions: write-all
 
 jobs:
-  get-latest-release:
+ get-latest-release:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,6 +25,22 @@ jobs:
         run: |
             echo "Version is ${{ env.VERSION }}"
 
+      - name: Extract latest changes from CHANGELOG.md
+        id: extract-changes
+        run: |
+            # Define the pattern for the latest version
+            latest_version_pattern="\[${{ env.VERSION }}\]"
+
+            # Use awk to find the start and end lines for the latest version
+            start_line=$(awk "/$latest_version_pattern/,/^## Version/" CHANGELOG.md | grep -n "$latest_version_pattern" | cut -d: -f1)
+            end_line=$(awk "/$latest_version_pattern/,/^## Version/" CHANGELOG.md | grep -n "^## Version" | head -n 1 | cut -d: -f1)
+
+            # Extract the changes for the latest version
+            changes=$(awk "NR>=$start_line && NR<=$end_line" CHANGELOG.md)
+
+            # Set the changes as an output
+            echo "::set-output name=changes::$changes"
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -32,15 +48,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
         with:
-          tag_name: ${{ env.VERSION }}  # Use the environment variable
+          tag_name: ${{ env.VERSION }} # Use the environment variable
           release_name: Release ${{ env.VERSION }}
           prerelease: false
           draft: false
-          body: |
-            This is the release notes for version ${{ env.VERSION }}.
-            You can add more details here.
+          body: ${{ steps.extract-changes.outputs.changes }} # Use the extracted changes as the body
 
-  build-and-upload:
+ build-and-upload:
     runs-on: ubuntu-latest
     needs: get-latest-release
 
@@ -67,5 +81,5 @@ jobs:
           AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          SOURCE_DIR: ./  # Directory containing the zip file
+          SOURCE_DIR: ./ # Directory containing the zip file
           DEST_DIR: /    # Destination directory in S3 (root directory)
