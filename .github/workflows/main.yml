@@ -35,7 +35,7 @@ jobs:
             changes=$(sed -n "/^## \[$latest_version\]/,/^## \[/p" CHANGELOG.md | sed '$d')
 
             # Set the changes as an output
-            echo "::set-output name=changes::$changes"
+            echo "Changes are ${{changes}}"
 
       - name: Create Release
         id: create_release
