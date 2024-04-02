@@ -30,6 +30,7 @@ jobs:
         run: |
             # Use awk to find the latest version
             latest_version=$(awk '/^## \[/ {print $2; exit}' CHANGELOG.md)
+            echo "Latest version is: $latest_version"
 
             # Extract the changes for the latest version
             changes=$(sed -n "/^## \[$latest_version\]/,/^## \[/p" CHANGELOG.md | sed '$d')
