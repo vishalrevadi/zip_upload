@@ -28,15 +28,11 @@ jobs:
       - name: Extract latest changes from CHANGELOG.md
         id: extract-changes
         run: |
-            # Define the pattern for the latest version
-            latest_version_pattern="\[${{ env.VERSION }}\]"
+            # Use awk to find the latest version
+            latest_version=$(awk '/^## \[/ {print $2; exit}' CHANGELOG.md)
 
-            # Use awk to find the start and end lines for the latest version
-            start_line=$(awk -v pattern="$latest_version_pattern" '$0 ~ pattern {print NR; exit}' CHANGELOG.md)
-            end_line=$(awk -v pattern="$latest_version_pattern" '$0 ~ pattern {print NR; exit}' CHANGELOG.md)
-            
             # Extract the changes for the latest version
-            changes=$(awk -v start="$start_line" -v end="$end_line" 'NR>=start && NR<=end' CHANGELOG.md)
+            changes=$(sed -n "/^## \[$latest_version\]/,/^## \[/p" CHANGELOG.md | sed '$d')
 
             # Set the changes as an output
             echo "::set-output name=changes::$changes"
