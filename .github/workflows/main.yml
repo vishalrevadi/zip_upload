@@ -25,23 +25,12 @@ jobs:
         run: |
             echo "Version is ${{ env.VERSION }}"
 
-      - name: Extract latest changes from CHANGELOG.md
-        id: extract-changes
-        run: |
-            # Use awk to find the latest version
-            latest_version=$(awk '/^## \[/ {print $2; exit}' CHANGELOG.md)
-            echo "Latest version is: $latest_version"
-
-            # Extract the changes for the latest version
-            changes=$(awk -v ver="$latest_version" '$0 ~ ver {f=1; next} f; /^##/{exit}' CHANGELOG.md)
-
-
-            # Output the changes to the log
-            echo "Changes extracted:"
-            echo "$changes"
-
-            # Set the changes as an output
-            echo "::set-output name=changes::$changes"
+      - name: Get notes
+        id: generate_notes
+        uses: anmarkoulis/commitizen-changelog-reader@master
+        with:
+          tag_name: refs/tags/v${{ env.VERSION }}
+          changelog: CHANGELOG.md
 
       - name: Create Release
         id: create_release
