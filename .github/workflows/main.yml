@@ -34,8 +34,12 @@ jobs:
             # Extract the changes for the latest version
             changes=$(sed -n "/^## \[$latest_version\]/,/^## \[/p" CHANGELOG.md | sed '$d')
 
+            # Output the changes to the log
+            echo "Changes extracted:"
+            echo "$changes"
+
             # Set the changes as an output
-            echo "Changes are ${{changes}}"
+            echo "::set-output name=changes::$changes"
 
       - name: Create Release
         id: create_release
