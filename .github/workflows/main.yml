@@ -20,18 +20,11 @@ jobs:
         run: |
             VERSION=$(jq -r '.version' manifest.json)
             echo "VERSION=$VERSION" >> $GITHUB_ENV
+
       - name: Use VERSION
         run: |
             echo "Version is ${{ env.VERSION }}"
-          
-  create-release:
-    runs-on: ubuntu-latest
-    needs: get-latest-release  # Explicitly depend on the previous job
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -49,7 +42,7 @@ jobs:
 
   build-and-upload:
     runs-on: ubuntu-latest
-    needs: create-release
+    needs: get-latest-release
 
     steps:
       - name: Checkout code
