@@ -49,7 +49,7 @@ jobs:
         id: convert_to_html
         uses: lifepal/markdown-to-html@v1.1
         with:
-          text: ${{ steps.extract-changes.outputs.changes }}
+          text: ${{join(fromJson(steps.generate_notes.outputs.notes).notes, '')}}
 
   build-and-upload:
     runs-on: ubuntu-latest
