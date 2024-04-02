@@ -32,11 +32,11 @@ jobs:
             latest_version_pattern="\[${{ env.VERSION }}\]"
 
             # Use awk to find the start and end lines for the latest version
-            start_line=$(awk "/$latest_version_pattern/,/^## Version/" CHANGELOG.md | grep -n "$latest_version_pattern" | cut -d: -f1)
-            end_line=$(awk "/$latest_version_pattern/,/^## Version/" CHANGELOG.md | grep -n "^## Version" | head -n 1 | cut -d: -f1)
-
+            start_line=$(awk -v pattern="$latest_version_pattern" '$0 ~ pattern {print NR; exit}' CHANGELOG.md)
+            end_line=$(awk -v pattern="$latest_version_pattern" '$0 ~ pattern {print NR; exit}' CHANGELOG.md)
+            
             # Extract the changes for the latest version
-            changes=$(awk "NR>=$start_line && NR<=$end_line" CHANGELOG.md)
+            changes=$(awk -v start="$start_line" -v end="$end_line" 'NR>=start && NR<=end' CHANGELOG.md)
 
             # Set the changes as an output
             echo "::set-output name=changes::$changes"
