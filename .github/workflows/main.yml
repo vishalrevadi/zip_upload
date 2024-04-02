@@ -24,6 +24,10 @@ jobs:
         id: tag_name
         run: |
           echo "CURR_VERSION=$(git describe --tags --abbrev=0)" >> "$GITHUB_ENV"
+          
+      - name: Verify CURR_VERSION
+        run: |
+          echo "CURR_VERSION is ${{ env.CURR_VERSION }}"
 
   create-release:
     runs-on: ubuntu-latest
