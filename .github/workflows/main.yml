@@ -25,9 +25,6 @@ jobs:
         run: |
           echo "CURR_VERSION=$(git describe --tags --abbrev=0)" >> "$GITHUB_ENV"
           
-      - name: Verify CURR_VERSION
-        run: |
-          echo "CURR_VERSION is ${{ env.CURR_VERSION }}"
 
   create-release:
     runs-on: ubuntu-latest
@@ -43,12 +40,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.CURR_VERSION }}
-          release_name: Release ${{ env.CURR_VERSION }}
+          tag_name: ${{ env.VERSION }}
+          release_name: Release ${{ env.VERSION }}
           prerelease: false
           draft: false
           body: |
-            This is the release notes for version ${{ env.CURR_VERSION }}.
+            This is the release notes for version ${{ env.VERSION }}.
             You can add more details here.
 
   build-and-upload:
