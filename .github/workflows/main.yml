@@ -18,7 +18,8 @@ jobs:
       - name: Get version from file
         id: get-version
         run: |
-          echo "VERSION=$(grep -oP "version = '\K[^']+" manifest.json)" >> "$GITHUB_ENV"
+          VERSION=$(grep -Eo '"version": "[^"]*' manifest.json | cut -d '"' -f2)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo ${{ env.VERSION }} 
           
   create-release:
