@@ -6,33 +6,23 @@ on:
       - main
 
 jobs:
-  get-latest-release:
+  get-version:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Get latest release version
-        id: get_latest_release
-        uses: actions/github-script@v4
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const latestRelease = await github.repos.getLatestRelease({
-              owner: context.repo.owner,
-              repo: context.repo.repo
-            });
-            console.log(latestRelease.data.tag_name);
-            const currentVersion = latestRelease.data.tag_name;
-            const versionComponents = currentVersion.split('.');
-            const majorVersion = parseInt(versionComponents[0]);
-            const minorVersion = parseInt(versionComponents[1]);
-            const patchVersion = parseInt(versionComponents[2]);
-            const nextVersion = `${majorVersion}.${minorVersion}.${patchVersion + 1}`;
-            console.log(nextVersion);
-            core.setOutput('next_version', nextVersion);
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Read version from manifest.json
+        id: get_version
+        run: |
+          version=$(jq -r '.version' manifest.json)
+          echo "Version: $version"
+          echo "::set-output name=version::$version"
 
   create-release:
     runs-on: ubuntu-latest
-    needs: get-latest-release
+    needs: get-version
 
     steps:
       - name: Checkout code
@@ -44,12 +34,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ needs.get-latest-release.outputs.next_version }}  # Use the tag name from the get-latest-release job
-          release_name: Release ${{ needs.get-latest-release.outputs.next_version }}
+          tag_name: ${{ needs.get-version.outputs.version }}
+          release_name: Release ${{ needs.get-version.outputs.version }}
           prerelease: false
           draft: false
           body: |
-            This is the release notes for version ${{ needs.get-latest-release.outputs.next_version }}.
+            This is the release notes for version ${{ needs.get-version.outputs.version }}.
             You can add more details here.
 
   build-and-upload:
