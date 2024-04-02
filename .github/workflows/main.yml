@@ -18,9 +18,11 @@ jobs:
       - name: Get version from file
         id: get-version
         run: |
-          VERSION=$(jq -r '.version' manifest.json)
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo ${{ env.VERSION }} 
+            VERSION=$(jq -r '.version' manifest.json)
+            echo "VERSION=$VERSION" >> $GITHUB_ENV
+      - name: Use VERSION
+        run: |
+            echo "Version is ${{ env.VERSION }}"
           
   create-release:
     runs-on: ubuntu-latest
