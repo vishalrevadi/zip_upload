@@ -43,7 +43,7 @@ jobs:
           release_name: Release ${{ env.VERSION }}
           prerelease: false
           draft: false
-          body: ${{ steps.extract-changes.outputs.changes }} # Use the extracted changes as the body
+          body: ${{join(fromJson(steps.generate_notes.outputs.notes).notes, '')}}
      
       - name: Convert release notes to HTML
         id: convert_to_html
