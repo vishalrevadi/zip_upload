@@ -11,7 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - missing requirement added for pytz [(#158)](https://github.com/Healthlane-Technologies/zelthy3/pull/158)
 
-
 ## [0.1.2] - 2024-03-20
 
 ### Fixed
