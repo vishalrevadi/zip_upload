@@ -55,6 +55,12 @@ jobs:
           prerelease: false
           draft: false
           body: ${{ steps.extract-changes.outputs.changes }} # Use the extracted changes as the body
+     
+      - name: Convert release notes to HTML
+        id: convert_to_html
+        uses: lifepal/markdown-to-html@v1.1
+        with:
+          text: ${{ steps.extract-changes.outputs.changes }}
 
   build-and-upload:
     runs-on: ubuntu-latest
