@@ -33,7 +33,8 @@ jobs:
             echo "Latest version is: $latest_version"
 
             # Extract the changes for the latest version
-            changes=$(sed -n "/^## \[$latest_version\]/,/^## \[/p" CHANGELOG.md | sed '$d')
+            changes=$(sed -n "/^## \[$latest_version\]/,/^## \[/p" CHANGELOG.md | sed '1d; $d')
+
 
             # Output the changes to the log
             echo "Changes extracted:"
