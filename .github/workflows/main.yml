@@ -39,7 +39,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
         with:
-          
+          tag_name: ${{ env.VERSION }}  # Use the environment variable
           release_name: Release ${{ env.VERSION }}
           prerelease: false
           draft: false
