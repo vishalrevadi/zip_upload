@@ -18,11 +18,12 @@ jobs:
       - name: Get version from file
         id: get-version
         run: |
-          echo "VERSION=$(jq -r '.version' manifest.json)" >> "$GITHUB_ENV"
+          VERSION=$(jq -r '.version' manifest.json)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV  # Directly set environment variable
 
   create-release:
     runs-on: ubuntu-latest
-    needs: get-latest-release
+    needs: get-latest-release  # Explicitly depend on the previous job
 
     steps:
       - name: Checkout code
@@ -34,7 +35,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.VERSION }}
+          tag_name: ${{ env.VERSION }}  # Use the environment variable
           release_name: Release ${{ env.VERSION }}
           prerelease: false
           draft: false
@@ -70,4 +71,4 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           SOURCE_DIR: ./  # Directory containing the zip file
-          DEST_DIR: /  # Destination directory in S3 (root directory)
+          DEST_DIR: /    # Destination directory in S3 (root directory)
