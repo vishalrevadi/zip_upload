@@ -1,14 +1,14 @@
 name: Zip and Upload to S3
 
 on:
- push:
+  push:
     branches:
       - main
 
 permissions: write-all
 
 jobs:
- get-latest-release:
+  get-latest-release:
     runs-on: ubuntu-latest
 
     steps:
@@ -50,7 +50,7 @@ jobs:
           draft: false
           body: ${{ steps.extract-changes.outputs.changes }} # Use the extracted changes as the body
 
- build-and-upload:
+  build-and-upload:
     runs-on: ubuntu-latest
     needs: get-latest-release
 
