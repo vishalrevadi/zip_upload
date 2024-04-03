@@ -3,7 +3,7 @@ name: Zip and Upload to S3
 on:
   push:
     branches:
-      - main
+      - vishalrevadi-patch-1
 
 permissions: write-all
 
